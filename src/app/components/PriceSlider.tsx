@@ -2,7 +2,7 @@ import {Slider} from "@heroui/react";
 import { useAppContext } from "../AppContext";
 
 const PriceSlider = () => {
-    const { setPriceRange } = useAppContext();
+    const { priceRange, setPriceRange } = useAppContext();
   
   return (
     <Slider
@@ -20,7 +20,7 @@ const PriceSlider = () => {
         ],
         step: "data-[in-range=true]:bg-black/30 dark:data-[in-range=true]:bg-white/50",
       }}
-      defaultValue={[1, 2]}
+      defaultValue={priceRange || [1, 2]}
       disableThumbScale={true}
       hideValue={true}
       formatOptions={{style: "currency", currency: "USD"}}

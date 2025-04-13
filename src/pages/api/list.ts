@@ -1,36 +1,38 @@
 import { getLogoPathApi, getLogoPathLocal } from '@/lib/logoPath';
+import { getMenuPathLocal } from '@/lib/menuPath';
 import { NextApiRequest, NextApiResponse } from 'next';
+
+const FOURSQUARE_API_KEY = process.env.FOURSQUARE_API_KEY || 'fsq3v5Khp/RLK2ZAn2HoqG64KGkOTHmBYW2sFBnnYKjx83A=';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const { latitude, longitude } = req.query;
+    const { latitude, longitude, distance } = req.query;
+    const rawPriceRange = req.query['priceRange[]'];
+    const priceRange = Array.isArray(rawPriceRange) ? rawPriceRange : [rawPriceRange];
 
-    const radius = 6000;
+    const radius = distance ? Math.round(parseInt(distance as string) * 1609.34) : 4000;
     const keyword = 'fast food';
-    const limit = 6;
-    const foursquareApiKey = 'fsq3v5Khp/RLK2ZAn2HoqG64KGkOTHmBYW2sFBnnYKjx83A=';
-    const fUrl = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&query=${keyword}&limit=${limit}`;
+    const limit = 8;
+    const min_price = priceRange[0] || 1;
+    const max_price = priceRange[1] || 4;
+    const fUrl = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&query=${keyword}&limit=${limit}&min_price=${min_price}&max_price=${max_price}`;
 
     try {
       const response = await fetch(fUrl, {
         method: 'GET',
         headers: {
-        'Authorization': foursquareApiKey,  // Set the authorization token as a header
-        'Content-Type': 'application/json',     // Optional: Set content type to JSON
+        'Authorization': FOURSQUARE_API_KEY,
+        'Content-Type': 'application/json',
         },
       });
       const data = await response.json();
 
       const tasks = data.results.map(async (result: any) => {
-        result.menu_link = 'https://www.mcdonalds.com/menu';
+        // get the logo path
+        result.logo = await getLogoPathLocal(result.name);
 
-        // get the logo path, local if exists, otherwise from API
-        const name = await getLogoPathLocal(result.name);
-        if (name) {
-          result.logo = name;
-        } else {
-          result.logo = await getLogoPathApi(result.name);
-        }
+        // get the menu link
+        result.menu_link = await getMenuPathLocal(result.name);
 
         return result;
       });

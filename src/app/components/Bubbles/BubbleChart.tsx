@@ -78,7 +78,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
 
     bubbles
     .on("click", function (event: any, d: any) { 
-      window.location.href = d.menu_link;
+      window.open(d.menu_link, '_blank');
     });
     
     bubbles.exit().remove();

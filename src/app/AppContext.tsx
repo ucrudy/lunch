@@ -42,8 +42,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, initialValue
   const [location, setLocation] = useState<Location | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState<boolean>(false);
-  const [distance, setDistance] = useState<number | null>(null);
-  const [priceRange, setPriceRange] = useState<number[] | null>(null);
+  const [distance, setDistance] = useState<number | null>(5);
+  const [priceRange, setPriceRange] = useState<number[] | null>([1,2]);
 
   return (
     <AppContext.Provider value={{ lunch, setLunch, location, setLocation, isModalOpen, setIsModalOpen, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, setDistance, priceRange, setPriceRange }}>

@@ -2,7 +2,7 @@ import {Slider} from "@heroui/react";
 import { useAppContext } from "../AppContext";
 
 const PriceSlider = () => {
-  const { setDistance } = useAppContext();
+  const { distance, setDistance } = useAppContext();
 
   return (
     <Slider
@@ -19,7 +19,7 @@ const PriceSlider = () => {
           "data-[dragging=true]:w-7 data-[dragging=true]:h-7 data-[dragging=true]:after:h-6 data-[dragging=true]:after:w-6",
         ],
       }}
-      defaultValue={3}
+      defaultValue={distance || 5}
       disableThumbScale={true}
       getValue={(miles) => `${miles} mi`}
       label="Distance"

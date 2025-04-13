@@ -49,20 +49,9 @@ const Home: React.FC<AppState> = () => {
     if (!location) return; // Don't fetch data if location is not available
     // Fetch the data from the /api/get route when the component mounts
     async function fetchData() {
-      console.log("inside fetchData", location?.latitude, location?.longitude);
-      // const googleApiKey = "AIzaSyAmD4sAv2G6r3vEIJwS53tskWnWU8IukBY"; // Replace with your Google API key
-      // const response2 = await axios.post(
-      //   'https://www.googleapis.com/geolocation/v1/geolocate?key=' + googleApiKey,
-      //   {
-      //     location: {
-      //       lat: location?.latitude,
-      //       lng: location?.longitude
-      //     }
-      //   }
-      // );
-      // console.log("browser location", location);
-      // console.log("google location", response2.data.location);
-      
+
+      console.log("priceRange", priceRange);
+
       const response = await axios.get('/api/list', {
         params: {
             latitude: location?.latitude,

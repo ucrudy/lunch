@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
-import { promisify } from 'util';
 
-const writeFile = promisify(fs.writeFile);
+const BRAND_FETCH_API_KEY = 'cY0Hn7qF0eneGh2MIGxyw3TuxUVEacsYqLKnECp2pQE=';
+const LOGO_DEV_API_KEY = 'sk_UKOG5iFdTz-mnuzFkdGW9w';
 
 // Helper to normalize names: lowercase, remove special characters
 function normalizeName(name: string): string {
@@ -27,7 +27,8 @@ export async function getLogoPathLocal(name: string): Promise<string | null> {
     const logoFile = logoMap[key];
   
     if (!logoFile) {
-      return null;
+      const logoFileApi = await getLogoPathApi(name);
+      return logoFileApi;
     }
 
     return logoFile; // Return the public URL path
@@ -37,7 +38,7 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
     
     const res = await fetch(`https://api.logo.dev/search?q=${name}`, {
         headers: {
-            "Authorization": `Bearer: sk_UKOG5iFdTz-mnuzFkdGW9w`
+            "Authorization": `Bearer: ${LOGO_DEV_API_KEY}`
         }
     });
 
@@ -48,9 +49,21 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
         const normalizeNamedName = normalizeName(name);
 
         // fire and forget download
-        downloadImage(normalizeNamedName, url)
-            .then(() => console.log(`✅ Saved ${dataLogo[0].logo_url}`))
-            .catch(err => console.error(`❌ Failed to save ${url}:`, err));
+        downloadImage(normalizeNamedName, url);
+
+        return url;
+    }
+    
+    const res2 = await fetch(`https://api.brandfetch.io/v2/search/${name}?c=${BRAND_FETCH_API_KEY}`);
+    
+    const dataLogoBackup = await res2.json();
+
+    if (Array.isArray(dataLogoBackup) && dataLogoBackup.length > 0) {
+        const url = dataLogoBackup[0].icon;
+        const normalizeNamedName = normalizeName(name);
+
+        // fire and forget download
+        downloadImage(normalizeNamedName, url);
 
         return url;
     }

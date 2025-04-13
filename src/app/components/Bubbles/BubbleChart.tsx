@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
 import { createBubbles } from './bubbleSVG'; 
 import { Lunch } from '@/types/lunch';
+import { Button } from '@heroui/react';
 
 type Props = {
   lunch: Lunch[];
@@ -11,14 +12,14 @@ type Props = {
 interface Bubble {
   id: string; 
   name: string;
-  logo: string; 
+  logo: string;
+  menu_link: string; 
   radius: number; 
   x: number; 
   y: number;
 }
 
 const BubbleChart: React.FC<Props> = ({ lunch }) => {
-  // const { openModal, isScrolling } = useAppContext();
   const svgRef = useRef(null);
   const width = typeof window !== 'undefined' ? window.innerWidth : 0;
   const height = 400;
@@ -29,6 +30,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
        id: l.fsq_id,
        name: l.name,
        logo: l.logo,
+       menu_link: l.menu_link,
        radius: Number(l.distance.toString().slice(0, -2)),
        x: width / 2,
        y: height / 2,
@@ -51,22 +53,16 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     .attr('width', width)
     .attr('height', height);
 
+    console.log('D3 simulation initialized');
     // Force simulation
     const simulation = d3.forceSimulation(data)
+    .alpha(0.4)
+    .alphaDecay(0.05)
+    .velocityDecay(0.7)
     .force("charge", d3.forceManyBody().strength(0.1)) // Repulsion force
-    // .force("center", d3.forceCenter(width/2, height/2)) // Center force to keep things centered
     .force("radial", d3.forceRadial(50, width / 2, height / 2))
     .force("collide", d3.forceCollide().radius((d) => (d as { radius: number }).radius + 1)) // Prevent overlap by setting a radius around each circle
-    .on("tick", ticked) // Update positions on each tick
-
-    // Add drag functionality
-    // const drag = d3.drag()
-    // .on("drag", (event, d) => {
-    //   d.x = event.x;
-    //   d.y = event.y;
-    //   simulation.alphaTarget(0.3).restart(); // Restart simulation on drag
-    //   ticked(); // Manually update positions
-    // });
+    .on("tick", ticked); // Update positions on each tick
 
     // Ticked function updates the positions of the circles based on simulation
     function ticked() {
@@ -80,9 +76,10 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
 
     bubbles.merge(bubbles);
 
-    // bubbles
-    // .on("click", function () { openModal(); });
-    // .call(drag);
+    bubbles
+    .on("click", function (event: any, d: any) { 
+      window.location.href = d.menu_link;
+    });
     
     bubbles.exit().remove();
 
@@ -97,6 +94,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
       id: Date.now().toString(), // Unique ID as a string
       name: "New Bubble", // Default name
       logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/390px-McDonald%27s_Golden_Arches.svg.png", // Default logo
+      menu_link: "https://www.mcdonalds.com/menu", // Default menu link
       radius: Math.random() * 30 + 20, // Random radius between 10 and 40
       x: width / 2, // Start from the center
       y: height / 2, // Start from the center
@@ -108,7 +106,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
 
   return (
     <div>
-      <button onClick={addBubble}>Add a Bubble</button>
+      <Button className='absolute mt-12' onPress={addBubble}>Add a Bubble</Button>
       <svg ref={svgRef} style={{ width: '100%', height: '400px' }}></svg>
     </div>
   );

@@ -9,36 +9,35 @@ export const createBubbles = (svg, data) => {
       .attr('transform', d => `translate(${d.x},${d.y})`);
 
     // Create a clip path to make the circle
-    // bubbles.append("defs")
-    // .append("clipPath")
-    // .attr("id", d => `circleClip-${d.x}`)
-    // .append("circle")
-    // .attr("r", d => d.radius)
-    // .attr('transform', d => `translate(${-(d.radius * 0.255)},${-(d.radius * 0.18)})`);
+    bubbles.append("defs")
+      .append("clipPath")
+      .attr("id", d => `circleClip-${d.id}`)
+      .append("circle")
+      .attr("r", d => d.radius);
 
     // Create a shadow filter to add a 3D shadow effect
     const filter = svg.append("defs")
-    .append("filter")
-    .attr("id", "shadow")
-    .attr("x", "-50%")
-    .attr("y", "-50%")
-    .attr("width", "200%")
-    .attr("height", "200%");
+      .append("filter")
+      .attr("id", "shadow")
+      .attr("x", "-50%")
+      .attr("y", "-50%")
+      .attr("width", "200%")
+      .attr("height", "200%");
 
     filter.append("feDropShadow")
-    .attr("dx", 3)  // Horizontal offset
-    .attr("dy", 2)  // Vertical offset
-    .attr("stdDeviation", 3)
-    .attr("flood-color", "#bdbdbd");  // Set shadow color to light grey;  // Blur radius
+      .attr("dx", 3)  // Horizontal offset
+      .attr("dy", 2)  // Vertical offset
+      .attr("stdDeviation", 3)
+      .attr("flood-color", "#bdbdbd");  // Set shadow color to light grey;  // Blur radius
 
     // Add a 3D gradient border
     const gradient = svg.append("defs")
-        .append("linearGradient")
-        .attr("id", "gradientBorder")
-        .attr("x1", "0%")
-        .attr("y1", "0%")
-        .attr("x2", "100%")
-        .attr("y2", "100%");
+      .append("linearGradient")
+      .attr("id", "gradientBorder")
+      .attr("x1", "0%")
+      .attr("y1", "0%")
+      .attr("x2", "100%")
+      .attr("y2", "100%");
 
     gradient.append("stop")
       .attr("offset", "50%")
@@ -52,22 +51,20 @@ export const createBubbles = (svg, data) => {
 
     bubbles.append('circle')
       .attr('r', d => d.radius)
-      .attr('fill', 'white')
+      .attr("fill", "white")
       .attr("stroke", "url(#gradientBorder)")
       .attr("stroke-width", 0.5)
       .style("filter", "url(#shadow)");
 
       // Add the background image inside each bubble (circle)
     bubbles.append('image')
-    .attr("id", "bubble-image")
-    .attr("x", d => -d.radius)  // Horizontal position: 20px from left edge
-    .attr("y", d => -d.radius)  // Vertical position: 20px from top edge
-      .attr('width', d => d.radius * 1.5) // 1.5
-      .attr('height', d => d.radius * 1.5) // 1.5
+      .attr("id", "bubble-image")
+      .attr("x", d => -d.radius)  // Horizontal position: 20px from left edge
+      .attr("y", d => -d.radius)  // Vertical position: 20px from top edge
+      .attr('width', d => d.radius * 2) // 1.5
+      .attr('height', d => d.radius * 2) // 1.5
       .attr('xlink:href', d => d.logo)
-      // .attr('preserveAspectRatio', 'xMidYMid slice')
-      // .attr("clip-path", d => "url(#circleClip-" + d.x + ")")
-      .attr('transform', d => `translate(${d.radius * 0.255},${d.radius * 0.18})`)
+      .attr("clip-path", d => "url(#circleClip-" + d.id + ")")
       .style('border-radius', '50%');  // Round the corners
 
     // Add hover action to change the color and show text

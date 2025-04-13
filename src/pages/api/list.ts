@@ -1,3 +1,4 @@
+import { getLogoPathApi, getLogoPathLocal } from '@/lib/logoPath';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -21,15 +22,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const data = await response.json();
 
       const tasks = data.results.map(async (result: any) => {
-        const res = await fetch(`https://api.logo.dev/search?q=${result.name}`, {
-          headers: {
-            "Authorization": `Bearer: sk_UKOG5iFdTz-mnuzFkdGW9w`
-          }
-        });
-        const dataLogo = await res.json();
-        if (Array.isArray(dataLogo) && dataLogo.length > 0) {
-          result.logo = dataLogo[0].logo_url;
+        result.menu_link = 'https://www.mcdonalds.com/menu';
+
+        // get the logo path, local if exists, otherwise from API
+        const name = await getLogoPathLocal(result.name);
+        if (name) {
+          result.logo = name;
+        } else {
+          result.logo = await getLogoPathApi(result.name);
         }
+
         return result;
       });
 

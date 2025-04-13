@@ -4,14 +4,20 @@ import axios from 'axios';
 import { AppState, useAppContext } from '@/app/AppContext';
 import BubbleChart from '@/app/components/Bubbles/BubbleChart';
 import {Button} from '@heroui/button'; 
+import LunchModal from './components/LunchModal';
+import PriceSlider from './components/PriceSlider';
+import DistanceSlider from './components/DistanceSlider';
+import { Mouse, SlidersHorizontal } from 'lucide-react';
+import { Chip, Drawer, DrawerBody, DrawerContent, DrawerHeader } from '@heroui/react';
 
 const Home: React.FC<AppState> = () => {
-  const { lunch, setLunch } = useAppContext();
+  const { lunch, setLunch, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, priceRange } = useAppContext();
   const { location, setLocation } = useAppContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  console.log("lunch", lunch);
+  
+  const state = useAppContext();
+  console.log("state", state);
   console.log("location", location);
   
   useEffect(() => {
@@ -61,6 +67,8 @@ const Home: React.FC<AppState> = () => {
         params: {
             latitude: location?.latitude,
             longitude: location?.longitude,
+            distance: distance,
+            priceRange: priceRange,
         },
       });
 
@@ -70,10 +78,12 @@ const Home: React.FC<AppState> = () => {
       
       const result = response;
 
+      console.log("result", result.data.results);
+
       setLunch(result.data.results);
     }
     fetchData();
-  }, [location?.latitude, location?.longitude]);
+  }, [location?.latitude, location?.longitude, distance, priceRange]);
 
   return (
     <div className="container mx-auto">
@@ -82,13 +92,31 @@ const Home: React.FC<AppState> = () => {
           Location: {location.latitude}, {location.longitude}
         </p>
       )}
-      <h1 className="text-3xl font-bold underline">
-        Hello world!
-      </h1>
-      <Button>Click me</Button>
-    <div>
-    </div>
+      <Drawer isOpen={isFilterDrawerOpen} placement="left" onOpenChange={() => setIsFilterDrawerOpen(false)}>
+        <DrawerContent>
+          {(onClose) => (
+            <>
+              <DrawerHeader className="flex flex-col gap-1">Filters</DrawerHeader>
+              <DrawerBody className="flex items-center">
+                <DistanceSlider />
+                <PriceSlider />
+              </DrawerBody>
+            </>
+          )}
+        </DrawerContent>
+      </Drawer>
+      
+      <Button isIconOnly aria-label="settings" className="absolute z-10 bg-gradient-to-tr from-pink-500 to-yellow-500 text-white shadow-lg"
+      radius="full" size="lg" variant="solid" onPress={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}>
+        <SlidersHorizontal />
+      </Button>
       <BubbleChart lunch={lunch} />
+      <LunchModal />
+      <div className="flex justify-center mt-4">
+        <Chip color="warning" variant="flat">
+          <div className='flex items-center'><Mouse />Scroll for more</div>
+        </Chip>
+      </div>
     </div>
   );
 };

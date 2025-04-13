@@ -32,7 +32,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
-          <AppProvider initialValue={{ lunch: [], location: null }}>
+          <AppProvider initialValue={{ lunch: [], location: null, isModalOpen: false }}>
               {children}
           </AppProvider>
         </Providers>

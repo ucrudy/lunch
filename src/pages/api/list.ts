@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     const radius = distance ? Math.round(parseInt(distance as string) * 1609.34) : 4000;
     const keyword = 'fast food';
-    const limit = 8;
+    const limit = 20;
     const min_price = priceRange[0] || 1;
     const max_price = priceRange[1] || 4;
     const fUrl = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&query=${keyword}&limit=${limit}&min_price=${min_price}&max_price=${max_price}`;

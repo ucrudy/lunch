@@ -66,6 +66,8 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
         downloadImage(normalizeNamedName, url);
 
         return url;
+    } else {
+        console.log("No logo found for: ", name);
     }
 
     return null;

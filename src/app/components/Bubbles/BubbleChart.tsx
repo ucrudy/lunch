@@ -4,6 +4,7 @@ import * as d3 from 'd3';
 import { createBubbles } from './bubbleSVG'; 
 import { Lunch } from '@/types/lunch';
 import { Button } from '@heroui/react';
+import { useAppContext } from '@/app/AppContext';
 
 type Props = {
   lunch: Lunch[];
@@ -20,24 +21,36 @@ interface Bubble {
 }
 
 const BubbleChart: React.FC<Props> = ({ lunch }) => {
+  const { distance } = useAppContext();
   const svgRef = useRef(null);
   const width = typeof window !== 'undefined' ? window.innerWidth : 0;
   const height = 400;
   const [data, setData] = useState<Bubble[]>([]);
 
   useEffect(() => { 
-    return setData(lunch.map((l: Lunch) => ({
+    
+    return setData(lunch.map((l: Lunch) => {
+      const distanceMiles = Math.round(l.distance * 0.000621371 * 100) / 100;
+      const distanceFactor = 1 - (distanceMiles / (distance || 1));
+      const radius = (Math.round(distanceFactor * 100) / 1.8) + 14;
+
+      if (!l.logo) {
+        console.log("no logo: ", l.name);
+      }
+
+      return ({
        id: l.fsq_id,
        name: l.name,
        logo: l.logo,
        menu_link: l.menu_link,
-       radius: Number(l.distance.toString().slice(0, -2)),
+       radius: radius,
        x: width / 2,
        y: height / 2,
-     })));
+     })}));
   }, [lunch]);
 
-  useEffect(() => {    // Initial empty chart
+  useEffect(() => {
+    console.log("draw chart with ", data);
     drawChart(data);
   }, [data]);
 
@@ -53,7 +66,6 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     .attr('width', width)
     .attr('height', height);
 
-    console.log('D3 simulation initialized');
     // Force simulation
     const simulation = d3.forceSimulation(data)
     .alpha(0.4)

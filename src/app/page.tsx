@@ -50,8 +50,6 @@ const Home: React.FC<AppState> = () => {
     // Fetch the data from the /api/get route when the component mounts
     async function fetchData() {
 
-      console.log("priceRange", priceRange);
-
       const response = await axios.get('/api/list', {
         params: {
             latitude: location?.latitude,

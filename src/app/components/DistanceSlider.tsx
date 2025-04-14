@@ -22,7 +22,7 @@ const PriceSlider = () => {
       defaultValue={distance || 5}
       disableThumbScale={true}
       getValue={(miles) => `${miles} mi`}
-      label="Distance"
+      label="Max Distance"
       maxValue={10}
       minValue={1}
       onChange={(sliderValue) => {

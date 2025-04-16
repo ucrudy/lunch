@@ -1,5 +1,5 @@
 import {Slider} from "@heroui/react";
-import { useAppContext } from "../AppContext";
+import { useAppContext } from "./AppContext";
 
 const PriceSlider = () => {
     const { priceRange, setPriceRange } = useAppContext();

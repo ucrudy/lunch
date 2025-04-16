@@ -5,11 +5,13 @@ import { Location } from "@/types/location";
 
 export interface AppState {
   lunch: Lunch[] | [];
+  loading: boolean;
   location: Location | null;
   distance: number | null;
   priceRange: number[] | null;
   isModalOpen: boolean;
   isFilterDrawerOpen: boolean;
+  isScrolling: boolean;
 }
 
 // Define the context value
@@ -17,15 +19,19 @@ interface AppContextType {
   lunch: Lunch[] | [];
   setLunch: React.Dispatch<React.SetStateAction<Lunch[] | []>>;
   location: Location | null;
-  setLocation: React.Dispatch<React.SetStateAction<Location | null>>;
+  setLocation: (newLocation: Location) => Promise<void>;
   distance: number | null;
-  setDistance: React.Dispatch<React.SetStateAction<number | null>>;
+  setDistance: (newDistance: number) => void;
   priceRange: number[] | null;
-  setPriceRange: React.Dispatch<React.SetStateAction<number[] | null>>;
+  setPriceRange: (newPrice: number[]) => void;
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isFilterDrawerOpen: boolean;
   setIsFilterDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  loading: boolean;
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  isScrolling: boolean;
+  setIsScrolling: React.Dispatch<React.SetStateAction<boolean>>;
 }
 // Create a context for managing modal state
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -39,14 +45,31 @@ interface AppProviderProps {
 // ModalProvider component that will hold the modal state
 export const AppProvider: React.FC<AppProviderProps> = ({ children, initialValue }) => {
   const [lunch, setLunch] = useState<Lunch[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [location, setLocation] = useState<Location | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState<boolean>(false);
-  const [distance, setDistance] = useState<number | null>(5);
-  const [priceRange, setPriceRange] = useState<number[] | null>([1,2]);
+  const [distance, setDistanceState] = useState<number | null>(5);
+  const [priceRange, setPriceRangeState] = useState<number[] | null>([1,2]);
+  const [isScrolling, setIsScrolling] = useState<boolean>(false);
+
+  const updatePriceRange = async (newPrice: number[]) => {
+    await setLunch([]);
+    setPriceRangeState(newPrice);
+  };
+
+  const updateDistance = async (newDistance: number) => {
+    await setLunch([]);
+    setDistanceState(newDistance);
+  };
+
+  const updateLocation = async (newLocation: Location) => {
+    await setLunch([]);
+    setLocation(newLocation);
+  };
 
   return (
-    <AppContext.Provider value={{ lunch, setLunch, location, setLocation, isModalOpen, setIsModalOpen, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, setDistance, priceRange, setPriceRange }}>
+    <AppContext.Provider value={{ lunch, setLunch, loading, setLoading, location, setLocation: updateLocation, isModalOpen, setIsModalOpen, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, setDistance: updateDistance, priceRange, setPriceRange: updatePriceRange, isScrolling, setIsScrolling }}>
         {children}
     </AppContext.Provider>
   );

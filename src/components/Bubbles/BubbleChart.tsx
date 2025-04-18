@@ -1,7 +1,6 @@
 'use client';
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
-import { createBubbles } from './bubbleSVG'; 
 import { Lunch } from '@/types/lunch';
 import { Button } from '@heroui/react';
 import { useAppContext } from '@/components/AppContext';
@@ -21,127 +20,198 @@ interface Bubble {
   y: number;
 }
 
+// bubbles
+// .on("click", function (event: any, d: any) { 
+//   window.open(d.menu_link, '_blank');
+// });
+
 const BubbleChart: React.FC<Props> = ({ lunch }) => {
   const { distance, isScrolling } = useAppContext();
-  const svgRef = useRef(null);
-  const width = typeof window !== 'undefined' ? window.innerWidth : 0;
-  const height = 400;
-  const [limit, setLimit] = useState(6);
-  const [data, setData] = useState<Bubble[]>([]);
 
-  const buildBubble = (l: Lunch) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const simulationRef = useRef<d3.Simulation<Bubble, undefined> | null>(null);
+  const bubblesRef = useRef<Bubble[]>([]);  
+  const imageMapRef = useRef<Record<string, HTMLImageElement>>({});
+
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  const drawBubbles = (ctx: CanvasRenderingContext2D) => {
+    const { width, height } = ctx.canvas;
+    ctx.clearRect(0, 0, width, height);
+
+    bubblesRef.current.forEach(bubble => {
+      if (!bubble.logo) return;
+      const img = imageMapRef.current[bubble.logo];
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+      ctx.shadowBlur = 20;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
+      ctx.beginPath();
+      ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#ffffff'; // Dummy fill to cast shadow
+      ctx.fill();
+      ctx.restore();
+      // Now clip and draw the image
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(bubble.x, bubble.y, bubble.radius, 0, Math.PI * 2);
+      ctx.clip();
+      if (img) {
+        ctx.drawImage(img, bubble.x - bubble.radius, bubble.y - bubble.radius, bubble.radius * 2, bubble.radius * 2);
+      }
+      ctx.restore();
+    });
+  };
+
+  const createBubble = (l: Lunch, width: number, height: number): Bubble => {
     const distanceMiles = Math.round(l.distance * 0.000621371 * 100) / 100;
     const distanceFactor = 1 - (distanceMiles / (distance || 1));
     const radius = (Math.round(distanceFactor * 100) / 1.8) + 14;
 
-    if (!l.logo) {
-      console.log("no logo: ", l.name);
-    }
+    return {
+      id: l.fsq_id,
+      name: l.name,
+      logo: l.logo,
+      menu_link: l.menu_link,
+      radius,
+      x: width / 2,
+      y: height / 2
+    };
+  };
 
-    return ({
-     id: l.fsq_id,
-     name: l.name,
-     logo: l.logo,
-     menu_link: l.menu_link,
-     radius: radius,
-     x: width / 2,
-     y: height / 2,
-   })
-  }
   // Function to add a new bubble
   const addBubble = () => {
-    console.log(" called add bubbles");
-    // get a slice of lunch using the limit
-    const lunchSlice = lunch.slice(lunch.length, limit);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    const newBubble = buildBubble({
+    const newBubble = createBubble({
       fsq_id: Date.now().toString(),
       name: "New Bubble", // Default name
       logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/390px-McDonald%27s_Golden_Arches.svg.png",
       menu_link: "https://www.mcdonalds.com/menu",
       distance: Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000,
       logo_color: ''
-    });
-    const copies = Array.from({ length: 10 }, () => ({ ...newBubble }));
-    // Add the new bubble to the data
-    setData([...data, ...copies]);
+    }, canvas.width, canvas.height);
+    const copies = Array.from({ length: 5 }, () => ({ ...newBubble, id: Date.now().toString() }));
+
+    bubblesRef.current.push(...copies);
+    // todo: use a promise
+    loadImagesThenStartSimulation();
   };
 
-  useEffect(() => { 
-    console.log("new lunch data: ", lunch);
-    console.log("limit: ", limit);
-    
-    return setData(lunch.map((l: Lunch) => buildBubble(l)));
-  }, [lunch]);
+  // useEffect(() => {
+  //   if(isScrolling) {
+  //     addBubble();
+  //   }
+  // }, [isScrolling]);
 
-  useEffect(() => {
-    console.log("draw chart with ", data);
-    drawChart(data);
-  }, [data]);
+  const loadImagesThenStartSimulation = () => {
+    const uniqueSrcs = [...new Set(bubblesRef.current.map(b => b.logo))];
+    let loaded = 0;
 
-  useEffect(() => {
-    if(isScrolling) {
-      console.log("Scrolling detected, adding bubbles ...");
-      setLimit((prevLimit) => prevLimit + 3);
-    }
-  }, [isScrolling]);
-
-  useEffect(() => { 
-    // find how many bubbles are needed using new limit and lunch.length
-
-    // addBubble();
-  }, [limit]);
-
-  const drawChart = (data: Bubble[]) => {      
-    const svg = d3.select(svgRef.current)
-    .attr('width', width)
-    .attr('height', height);
-
-    if (Array.isArray(data) && data.length === 0) {
-      svg.selectAll('*').remove();
-      return;
-    }
-
-    console.log("data: ", data);
-
-    // Force simulation
-    const simulation = d3.forceSimulation(data)
-    .alpha(0.4)
-    .alphaDecay(0.05)
-    .velocityDecay(0.7)
-    .force("charge", d3.forceManyBody().strength(0.1)) // Repulsion force
-    .force("radial", d3.forceRadial(50, width / 2, height / 2))
-    .force("collide", d3.forceCollide().radius((d) => (d as { radius: number }).radius + 1)) // Prevent overlap by setting a radius around each circle
-    .on("tick", ticked); // Update positions on each tick
-
-    // Ticked function updates the positions of the circles based on simulation
-    function ticked() {
-      svg.selectAll('g')
-        .data(data)
-        .attr('transform', (d: { x: any; y: any; }) => `translate(${d.x},${d.y})`);
-    }
-  
-    // Create the bubbles (circles)
-    const bubbles = createBubbles(svg, data);
-
-    bubbles.merge(bubbles);
-
-    bubbles
-    .on("click", function (event: any, d: any) { 
-      window.open(d.menu_link, '_blank');
+    // Preload images
+    uniqueSrcs.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        imageMapRef.current[src] = img;
+        loaded++;
+        if (loaded === uniqueSrcs.length) {
+          startSimulation();
+        }
+      };
     });
-    
-    bubbles.exit().remove();
+  }
 
-    // Update the simulation with new data
-    simulation.nodes(data);
-  };  
+  const startSimulation = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Click event
+    canvas.addEventListener('click', e => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      bubblesRef.current.forEach(bubble => {
+        const dx = x - bubble.x;
+        const dy = y - bubble.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < bubble.radius) {
+          window.open(bubble.menu_link, '_blank');
+        }
+      });
+    });
+    // hover detection
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      let found = null;
+      for (let node of bubblesRef.current) {
+        const dx = x - node.x;
+        const dy = y - node.y;
+        if (Math.sqrt(dx * dx + dy * dy) < node.radius) {
+          found = node.id;
+          break;
+        }
+      }
+
+      setHoveredId(found); // will trigger re-draw with new color
+    });
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    if (simulationRef.current) simulationRef.current.stop();
+
+    simulationRef.current = d3.forceSimulation(bubblesRef.current)
+      .alpha(0.4)
+      .alphaDecay(0.05)
+      .velocityDecay(0.7)
+      .force("charge", d3.forceManyBody().strength(0.1)) // Repulsion force
+      .force("radial", d3.forceRadial(50, width / 2, height / 2))
+      .force("collide", d3.forceCollide().radius((d) => (d as { radius: number }).radius + 1))
+      .on('tick', () => {
+        const ctx = canvasRef.current ? canvasRef.current.getContext('2d') : null;
+
+        if (ctx) {
+          drawBubbles(ctx);
+        }
+      });
+  };
+
+  useEffect(() => {
+    console.log("hoverid: ", hoveredId);
+    // change color of bubble and show menu text
+  }, [hoveredId]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.width = 600;
+    canvas.height = 600;
+
+    bubblesRef.current = lunch.map((l: Lunch) => createBubble(l, canvas.width, canvas.height) as Bubble);
+    // todo: use a promise
+    loadImagesThenStartSimulation();
+  }, [lunch]);
 
   return (
     <div>
       <ScrollAttempt />
       <Button className='absolute mt-12' onPress={addBubble}>Add a Bubble</Button>
-      <svg ref={svgRef} style={{ width: '100%', height: '400px' }}></svg>
+      <div className="flex justify-center mt-4 mb-4">
+        <canvas
+          ref={canvasRef}
+          className="border-2 border-gray-300 rounded-lg shadow-lg"
+        />
+      </div>
     </div>
   );
 };

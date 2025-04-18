@@ -38,12 +38,12 @@ const InfoModal = () => {
             </div>
             <div className="flex flex-col mt-2">
               <p className="text-md">Tech</p>
-              <p className="text-small text-default-500">TypeScript - React - D3.js - Next.js - Foursquare API</p>
+              <p className="text-small text-default-500">TypeScript - React - Canvas + D3 - Next.js - Foursquare API</p>
             </div>
             <div className="flex flex-col mt-2">
               <p className="text-md">Features</p>
               <p className="text-small text-default-500">Geolocation</p>
-              <p className="text-small text-default-500">Custom UI with D3, React, HeroUI, Tailwind</p>
+              <p className="text-small text-default-500">Custom UI with Canvas + D3, React, HeroUI, Tailwind</p>
               <p className="text-small text-default-500">Filters connected with state management</p>
               <p className="text-small text-default-500">External API data retrieval and backend caching</p>
             </div>

@@ -2,9 +2,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
 import { Lunch } from '@/types/lunch';
-import { Button } from '@heroui/react';
 import { useAppContext } from '@/components/AppContext';
 import ScrollAttempt from '../ScrollAttempt';
+import { fetchLunch } from '@/lib/fetchLunch';
 
 type Props = {
   lunch: Lunch[];
@@ -26,7 +26,7 @@ interface Bubble {
 // });
 
 const BubbleChart: React.FC<Props> = ({ lunch }) => {
-  const { distance, isScrolling } = useAppContext();
+  const { location, distance, priceRange, page, isScrolling, setLoading, setPage } = useAppContext();
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const simulationRef = useRef<d3.Simulation<Bubble, undefined> | null>(null);
@@ -82,30 +82,29 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
   };
 
   // Function to add a new bubble
-  const addBubble = () => {
+  const getMoreBubbles = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const newBubble = createBubble({
-      fsq_id: Date.now().toString(),
-      name: "New Bubble", // Default name
-      logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/McDonald%27s_Golden_Arches.svg/390px-McDonald%27s_Golden_Arches.svg.png",
-      menu_link: "https://www.mcdonalds.com/menu",
-      distance: Math.floor(Math.random() * (6000 - 3000 + 1)) + 3000,
-      logo_color: ''
-    }, canvas.width, canvas.height);
-    const copies = Array.from({ length: 5 }, () => ({ ...newBubble, id: Date.now().toString() }));
+    // call api with page number as offset/limit
+    const newPage = (page || 1) + 1;
+    setLoading(true);
+    setPage(newPage);
+    const lunch = await fetchLunch(location, distance, priceRange, newPage);
+    const lunchBubbles = lunch.map((l: Lunch) => createBubble(l, canvas.width, canvas.height) as Bubble);
+    console.log("lunchBubbles", lunchBubbles);
+    setLoading(false);
 
-    bubblesRef.current.push(...copies);
+    bubblesRef.current.push(...lunchBubbles);
     // todo: use a promise
     loadImagesThenStartSimulation();
   };
 
-  // useEffect(() => {
-  //   if(isScrolling) {
-  //     addBubble();
-  //   }
-  // }, [isScrolling]);
+  useEffect(() => {
+    if(isScrolling) {
+      getMoreBubbles();
+    }
+  }, [isScrolling]);
 
   const loadImagesThenStartSimulation = () => {
     const uniqueSrcs = [...new Set(bubblesRef.current.map(b => b.logo))];
@@ -194,22 +193,33 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.width = 600;
-    canvas.height = 600;
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-    bubblesRef.current = lunch.map((l: Lunch) => createBubble(l, canvas.width, canvas.height) as Bubble);
-    // todo: use a promise
-    loadImagesThenStartSimulation();
+      bubblesRef.current = lunch.map((l: Lunch) => createBubble(l, canvas.width, canvas.height) as Bubble);
+      // todo: use a promise
+      loadImagesThenStartSimulation();
+    };
+
+    // Initial size
+    resizeCanvas();
+
+    // Resize on window change
+    window.addEventListener('resize', resizeCanvas);
+
+    // Clean up on unmount
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+    };
   }, [lunch]);
 
   return (
     <div>
       <ScrollAttempt />
-      <Button className='absolute mt-12' onPress={addBubble}>Add a Bubble</Button>
-      <div className="flex justify-center mt-4 mb-4">
+      <div className="flex justify-center">
         <canvas
           ref={canvasRef}
-          className="border-2 border-gray-300 rounded-lg shadow-lg"
         />
       </div>
     </div>

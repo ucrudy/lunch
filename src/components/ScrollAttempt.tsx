@@ -33,9 +33,8 @@ const ScrollAttempt = () => {
   }, []);
 
   return (
-      <div>
-        <strong>Is the user attempting to scroll?</strong> {isScrolling ? 'Yes' : 'No'}
-      </div>
+      <>
+      </>
   );
 };
 

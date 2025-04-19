@@ -1,27 +1,27 @@
-import { getLogoPathApi, getLogoPathLocal } from '@/lib/logoPath';
+import {getLogoPathLocal } from '@/lib/logoPath';
 import { getMenuPathLocal } from '@/lib/menuPath';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-const FOURSQUARE_API_KEY = process.env.FOURSQUARE_API_KEY || 'fsq3v5Khp/RLK2ZAn2HoqG64KGkOTHmBYW2sFBnnYKjx83A=';
+const FOURSQUARE_API_KEY = process.env.FOURSQUARE_API_KEY;
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
-    const { latitude, longitude, distance } = req.query;
+    const { latitude, longitude, distance, offset } = req.query;
     const rawPriceRange = req.query['priceRange[]'];
     const priceRange = Array.isArray(rawPriceRange) ? rawPriceRange : [rawPriceRange];
 
     const radius = distance ? Math.round(parseInt(distance as string) * 1609.34) : 4000;
     const keyword = 'fast food';
-    const limit = 20;
+    const limit = (parseInt(offset as string) == 0) ? 20 : 10;
     const min_price = priceRange[0] || 1;
     const max_price = priceRange[1] || 4;
-    const fUrl = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&query=${keyword}&limit=${limit}&min_price=${min_price}&max_price=${max_price}`;
+    const fUrl = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&query=${keyword}&limit=${limit}&min_price=${min_price}&max_price=${max_price}&offset=${offset}`;
 
     try {
       const response = await fetch(fUrl, {
         method: 'GET',
         headers: {
-        'Authorization': FOURSQUARE_API_KEY,
+        'Authorization': FOURSQUARE_API_KEY || '',
         'Content-Type': 'application/json',
         },
       });

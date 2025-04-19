@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-const API_KEY = 'AIzaSyAmD4sAv2G6r3vEIJwS53tskWnWU8IukBY';
-const CX = 'f09ca241a91754b1e';
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+const GOOGLE_CX = process.env.GOOGLE_CX;
 
 interface SearchResult {
   title: string;
@@ -77,7 +77,7 @@ function scoreResult(result: SearchResult): number {
 
 export async function getMenuPath(name: string) {
   const query = `${name} menu`;
-  const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${API_KEY}&cx=${CX}`;
+  const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&key=${GOOGLE_API_KEY}&cx=${GOOGLE_CX}`;
 
   const res = await fetch(url);
   const data = await res.json();

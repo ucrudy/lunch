@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
-const BRAND_FETCH_API_KEY = 'cY0Hn7qF0eneGh2MIGxyw3TuxUVEacsYqLKnECp2pQE=';
-const LOGO_DEV_API_KEY = 'sk_UKOG5iFdTz-mnuzFkdGW9w';
+const BRAND_FETCH_API_KEY = process.env.BRAND_FETCH_API_KEY;
+const LOGO_DEV_API_KEY = process.env.LOGO_DEV_API_KEY;
 
 // Helper to normalize names: lowercase, remove special characters
 function normalizeName(name: string): string {

@@ -9,6 +9,7 @@ export interface AppState {
   location: Location | null;
   distance: number | null;
   priceRange: number[] | null;
+  page: number | null;
   isModalOpen: boolean;
   isFilterDrawerOpen: boolean;
   isScrolling: boolean;
@@ -24,6 +25,8 @@ interface AppContextType {
   setDistance: (newDistance: number) => void;
   priceRange: number[] | null;
   setPriceRange: (newPrice: number[]) => void;
+  page: number | null;
+  setPage: (newPage: number) => void;
   isModalOpen: boolean;
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isFilterDrawerOpen: boolean;
@@ -52,24 +55,28 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children, initialValue
   const [distance, setDistanceState] = useState<number | null>(5);
   const [priceRange, setPriceRangeState] = useState<number[] | null>([1,2]);
   const [isScrolling, setIsScrolling] = useState<boolean>(false);
+  const [page, setPage] = useState<number | null>(1);
 
   const updatePriceRange = async (newPrice: number[]) => {
     await setLunch([]);
+    await setPage(1);
     setPriceRangeState(newPrice);
   };
 
   const updateDistance = async (newDistance: number) => {
     await setLunch([]);
+    await setPage(1);
     setDistanceState(newDistance);
   };
 
   const updateLocation = async (newLocation: Location) => {
     await setLunch([]);
+    await setPage(1);
     setLocation(newLocation);
   };
 
   return (
-    <AppContext.Provider value={{ lunch, setLunch, loading, setLoading, location, setLocation: updateLocation, isModalOpen, setIsModalOpen, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, setDistance: updateDistance, priceRange, setPriceRange: updatePriceRange, isScrolling, setIsScrolling }}>
+    <AppContext.Provider value={{ lunch, setLunch, loading, setLoading, location, page, setPage, setLocation: updateLocation, isModalOpen, setIsModalOpen, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, setDistance: updateDistance, priceRange, setPriceRange: updatePriceRange, isScrolling, setIsScrolling }}>
         {children}
     </AppContext.Provider>
   );

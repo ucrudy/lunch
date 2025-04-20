@@ -2,11 +2,11 @@
 import { useEffect, useState } from 'react';
 import { MapPinCheck } from 'lucide-react';
 import {Button} from '@heroui/button'; 
-import { AppState, useAppContext } from '@/components/AppContext';
+import { useAppContext } from '@/components/AppContext';
 import LoadingOverlay from '@/components/LoadingOverlay';
 import App from '@/components/App';
 
-const Home: React.FC<AppState> = () => {
+const Home: React.FC = () => {
   const { setLoading } = useAppContext();
   const { location, setLocation } = useAppContext();
   const [showLocationPrompt, setShowLocationPrompt] = useState<boolean>(false);
@@ -34,7 +34,7 @@ const Home: React.FC<AppState> = () => {
       }
     };
     getCurrentLocation();
-  }, []);
+  }, [location, setLoading, setLocation]);
 
   if(showLocationPrompt && !location) {
     return (

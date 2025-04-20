@@ -28,7 +28,7 @@ const InfoModal = () => {
           closeButton: "text-lg hover:bg-white/5 active:bg-white/10",
         }}>
     <ModalContent>
-      {(onClose) => (
+      {() => (
         <>
           <ModalHeader className="flex flex-col gap-1">Info</ModalHeader>
           <ModalBody>

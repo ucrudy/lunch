@@ -1,5 +1,6 @@
 import {getLogoPathLocal } from '@/lib/logoPath';
 import { getMenuPathLocal } from '@/lib/menuPath';
+import { Lunch } from '@/types/lunch';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 const FOURSQUARE_API_KEY = process.env.FOURSQUARE_API_KEY;
@@ -27,12 +28,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
       const data = await response.json();
 
-      const tasks = data.results.map(async (result: any) => {
+      const tasks = data.results.map(async (result: Lunch) => {
         // get the logo path
-        result.logo = await getLogoPathLocal(result.name);
+        result.logo = await getLogoPathLocal(result.name) || '';
 
         // get the menu link
-        result.menu_link = await getMenuPathLocal(result.name);
+        result.menu_link = await getMenuPathLocal(result.name) || '';
 
         return result;
       });

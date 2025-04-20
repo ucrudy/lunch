@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import * as d3 from 'd3';
 import { Lunch } from '@/types/lunch';
 import { useAppContext } from '@/components/AppContext';
@@ -59,7 +59,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     });
   };
 
-  const createBubble = (l: Lunch, width: number, height: number): Bubble => {
+  const createBubble = useCallback((l: Lunch, width: number, height: number): Bubble => {
     const distanceMiles = Math.round(l.distance * 0.000621371 * 100) / 100;
     const distanceFactor = 1 - (distanceMiles / (distance || 1));
     const radius = (Math.round(distanceFactor * 100) / 1.8) + 14;
@@ -73,7 +73,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
       x: width / 2,
       y: height / 2
     };
-  };
+  }, [distance]);
 
   const getMoreBubbles = async () => {
     const canvas = canvasRef.current;
@@ -97,25 +97,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     }
   }, [isScrolling]);
 
-  const loadImagesThenStartSimulation = () => {
-    const uniqueSrcs = [...new Set(bubblesRef.current.map(b => b.logo))];
-    let loaded = 0;
-
-    // Preload images
-    uniqueSrcs.forEach(src => {
-      const img = new Image();
-      img.src = src;
-      img.onload = () => {
-        imageMapRef.current[src] = img;
-        loaded++;
-        if (loaded === uniqueSrcs.length) {
-          startSimulation();
-        }
-      };
-    });
-  }
-
-  const startSimulation = () => {
+  const startSimulation = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -142,7 +124,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
       const y = e.clientY - rect.top;
 
       let found = null;
-      for (let node of bubblesRef.current) {
+      for (const node of bubblesRef.current) {
         const dx = x - node.x;
         const dy = y - node.y;
         if (Math.sqrt(dx * dx + dy * dy) < node.radius) {
@@ -169,7 +151,25 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
           drawBubbles(ctx);
         }
       });
-  };
+  }, []);
+
+  const loadImagesThenStartSimulation = useCallback(() => {
+    const uniqueSrcs = [...new Set(bubblesRef.current.map(b => b.logo))];
+    let loaded = 0;
+
+    // Preload images
+    uniqueSrcs.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        imageMapRef.current[src] = img;
+        loaded++;
+        if (loaded === uniqueSrcs.length) {
+          startSimulation();
+        }
+      };
+    });
+  },  [startSimulation]);
 
   useEffect(() => {
     console.log("hoverid: ", hoveredId);
@@ -209,7 +209,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, [lunch]);
+  }, [lunch, createBubble, loadImagesThenStartSimulation]);
 
   return (
     <div>

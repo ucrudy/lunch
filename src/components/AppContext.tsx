@@ -4,7 +4,7 @@ import { Lunch } from "@/types/lunch";
 import { Location } from "@/types/location";
 
 export interface AppState {
-  lunch: Lunch[] | [];
+  lunch: Lunch[] | null;
   loading: boolean;
   location: Location | null;
   distance: number | null;
@@ -17,8 +17,8 @@ export interface AppState {
 
 // Define the context value
 interface AppContextType {
-  lunch: Lunch[] | [];
-  setLunch: React.Dispatch<React.SetStateAction<Lunch[] | []>>;
+  lunch: Lunch[];
+  setLunch: React.Dispatch<React.SetStateAction<Lunch[]>>;
   location: Location | null;
   setLocation: (newLocation: Location) => Promise<void>;
   distance: number | null;
@@ -46,7 +46,7 @@ interface AppProviderProps {
 }
 
 // ModalProvider component that will hold the modal state
-export const AppProvider: React.FC<AppProviderProps> = ({ children, initialValue }) => {
+export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [lunch, setLunch] = useState<Lunch[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [location, setLocation] = useState<Location | null>(null);

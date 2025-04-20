@@ -13,7 +13,7 @@ import InfoModal from '@/components/InfoModal';
 import { fetchLunch } from '@/lib/fetchLunch';
 
 const App: React.FC = () => {
-  const { lunch, setLunch, page, loading, setLoading, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, priceRange, setIsModalOpen, isModalOpen } = useAppContext();
+  const { lunch, setLunch, loading, setLoading, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, priceRange, setIsModalOpen, isModalOpen } = useAppContext();
   const { location } = useAppContext();
   
   // get initial data of lunch places
@@ -22,20 +22,20 @@ const App: React.FC = () => {
     setLoading(true);
     
     async function fetchData() {
-      const lunch = await fetchLunch(location, distance, priceRange, page);
+      const lunch = await fetchLunch(location, distance, priceRange, 1);
 
       setLunch(lunch);
       setLoading(false);
     }
     fetchData();
-  }, [location?.latitude, location?.longitude, distance, priceRange]);
+  }, [location?.latitude, location?.longitude, distance, priceRange, location, setLoading, setLunch]);
 
   return (
     <div className="container mx-auto">
       <LoadingOverlay isLoading={loading} />
       <Drawer isOpen={isFilterDrawerOpen} placement="left" onOpenChange={() => setIsFilterDrawerOpen(false)}>
         <DrawerContent>
-          {(onClose) => (
+          {() => (
             <>
               <DrawerHeader className="flex flex-col gap-1">Filters</DrawerHeader>
               <DrawerBody className="flex items-center">

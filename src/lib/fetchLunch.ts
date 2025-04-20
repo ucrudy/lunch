@@ -5,7 +5,6 @@ export async function fetchLunch(location: Location | null, distance: number | n
     const newPage = page || 1; 
     // first page returns 20, after that return 10 each
     const offset = (newPage == 1 ? newPage - 1 : (newPage * 10));
-    console.log("offset",offset);
     const response = await axios.get('/api/list', {
       params: {
           latitude: location?.latitude,

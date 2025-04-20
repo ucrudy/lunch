@@ -20,11 +20,6 @@ interface Bubble {
   y: number;
 }
 
-// bubbles
-// .on("click", function (event: any, d: any) { 
-//   window.open(d.menu_link, '_blank');
-// });
-
 const BubbleChart: React.FC<Props> = ({ lunch }) => {
   const { location, distance, priceRange, page, isScrolling, setLoading, setPage } = useAppContext();
 
@@ -36,8 +31,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const drawBubbles = (ctx: CanvasRenderingContext2D) => {
-    const { width, height } = ctx.canvas;
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0,  window.innerWidth, window.innerHeight);
 
     bubblesRef.current.forEach(bubble => {
       if (!bubble.logo) return;
@@ -81,7 +75,6 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     };
   };
 
-  // Function to add a new bubble
   const getMoreBubbles = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -91,12 +84,10 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     setLoading(true);
     setPage(newPage);
     const lunch = await fetchLunch(location, distance, priceRange, newPage);
-    const lunchBubbles = lunch.map((l: Lunch) => createBubble(l, canvas.width, canvas.height) as Bubble);
-    console.log("lunchBubbles", lunchBubbles);
+    const lunchBubbles = lunch.map((l: Lunch) => createBubble(l, window.innerWidth, window.innerHeight) as Bubble);
     setLoading(false);
 
     bubblesRef.current.push(...lunchBubbles);
-    // todo: use a promise
     loadImagesThenStartSimulation();
   };
 
@@ -160,11 +151,8 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
         }
       }
 
-      setHoveredId(found); // will trigger re-draw with new color
+      setHoveredId(found);
     });
-
-    const width = canvas.width;
-    const height = canvas.height;
 
     if (simulationRef.current) simulationRef.current.stop();
 
@@ -172,12 +160,11 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
       .alpha(0.4)
       .alphaDecay(0.05)
       .velocityDecay(0.7)
-      .force("charge", d3.forceManyBody().strength(0.1)) // Repulsion force
-      .force("radial", d3.forceRadial(50, width / 2, height / 2))
+      .force("charge", d3.forceManyBody().strength(0.1))
+      .force("radial", d3.forceRadial(50, window.innerWidth / 2, window.innerHeight / 2))
       .force("collide", d3.forceCollide().radius((d) => (d as { radius: number }).radius + 1))
       .on('tick', () => {
         const ctx = canvasRef.current ? canvasRef.current.getContext('2d') : null;
-
         if (ctx) {
           drawBubbles(ctx);
         }
@@ -194,11 +181,21 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     if (!canvas) return;
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      const width = window.innerWidth;
+      const height =  window.innerHeight;
 
-      bubblesRef.current = lunch.map((l: Lunch) => createBubble(l, canvas.width, canvas.height) as Bubble);
-      // todo: use a promise
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      
+      const ctx = canvasRef.current ? canvasRef.current.getContext('2d') : null;
+      if (ctx) {
+        ctx.scale(dpr, dpr);
+      }
+      bubblesRef.current = lunch.map((l: Lunch) => createBubble(l, width, height) as Bubble);
       loadImagesThenStartSimulation();
     };
 

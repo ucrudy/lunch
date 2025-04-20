@@ -15,10 +15,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const limit = (parseInt(offset as string) == 0) ? 20 : 10;
     const min_price = priceRange[0] || 1;
     const max_price = priceRange[1] || 4;
-    const fUrl = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&query=${keyword}&limit=${limit}&min_price=${min_price}&max_price=${max_price}&offset=${offset}`;
+    const url = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&query=${keyword}&limit=${limit}&min_price=${min_price}&max_price=${max_price}&offset=${offset}`;
 
     try {
-      const response = await fetch(fUrl, {
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
         'Authorization': FOURSQUARE_API_KEY || '',

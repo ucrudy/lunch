@@ -16,6 +16,7 @@ const App: React.FC = () => {
   const { lunch, setLunch, page, loading, setLoading, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, priceRange, setIsModalOpen, isModalOpen } = useAppContext();
   const { location } = useAppContext();
   
+  // get initial data of lunch places
   useEffect(() => {
     if (!location) return;
     setLoading(true);

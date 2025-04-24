@@ -28,8 +28,6 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
   const bubblesRef = useRef<Bubble[]>([]);  
   const imageMapRef = useRef<Record<string, HTMLImageElement>>({});
 
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-
   const drawBubbles = (ctx: CanvasRenderingContext2D) => {
     ctx.clearRect(0, 0,  window.innerWidth, window.innerHeight);
 
@@ -68,7 +66,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
       id: l.fsq_id,
       name: l.name,
       logo: l.logo,
-      menu_link: l.menu_link,
+      menu_link: l.menu_link || '',
       radius,
       x: width / 2,
       y: height / 2
@@ -84,7 +82,8 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
     setLoading(true);
     setPage(newPage);
     const lunch = await fetchLunch(location, distance, priceRange, newPage);
-    const lunchBubbles = lunch.map((l: Lunch) => createBubble(l, window.innerWidth, window.innerHeight) as Bubble);
+    const filteredLunch = lunch.filter((l: Lunch) => l.logo);
+    const lunchBubbles = filteredLunch.map((l: Lunch) => createBubble(l, window.innerWidth, window.innerHeight) as Bubble);
     setLoading(false);
 
     bubblesRef.current.push(...lunchBubbles);
@@ -117,24 +116,6 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
         }
       });
     });
-    // hover detection
-    canvas.addEventListener('mousemove', e => {
-      const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      let found = null;
-      for (const node of bubblesRef.current) {
-        const dx = x - node.x;
-        const dy = y - node.y;
-        if (Math.sqrt(dx * dx + dy * dy) < node.radius) {
-          found = node.id;
-          break;
-        }
-      }
-
-      setHoveredId(found);
-    });
 
     if (simulationRef.current) simulationRef.current.stop();
 
@@ -154,7 +135,7 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
   }, []);
 
   const loadImagesThenStartSimulation = useCallback(() => {
-    const uniqueSrcs = [...new Set(bubblesRef.current.map(b => b.logo))];
+    const uniqueSrcs = [...new Set(bubblesRef.current.filter(b => b.logo !== '').map(b => b.logo))];
     let loaded = 0;
 
     // Preload images
@@ -170,11 +151,6 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
       };
     });
   },  [startSimulation]);
-
-  useEffect(() => {
-    console.log("hoverid: ", hoveredId);
-    // change color of bubble and show menu text
-  }, [hoveredId]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -195,7 +171,9 @@ const BubbleChart: React.FC<Props> = ({ lunch }) => {
       if (ctx) {
         ctx.scale(dpr, dpr);
       }
-      bubblesRef.current = lunch.map((l: Lunch) => createBubble(l, width, height) as Bubble);
+      const lunchBubbles = lunch.map((l: Lunch) => createBubble(l, width, height) as Bubble);
+      
+      bubblesRef.current = lunchBubbles;
       loadImagesThenStartSimulation();
     };
 

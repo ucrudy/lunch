@@ -12,8 +12,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const priceRange = Array.isArray(rawPriceRange) ? rawPriceRange : [rawPriceRange];
 
     const radius = distance ? Math.round(parseInt(distance as string) * 1609.34) : 4000;
-    const keyword = 'fast food';
+    const keyword = 'lunch';
     const limit = (parseInt(offset as string) == 0) ? 20 : 10;
+
     const min_price = priceRange[0] || 1;
     const max_price = priceRange[1] || 4;
     const url = `https://api.foursquare.com/v3/places/search?ll=${latitude},${longitude}&radius=${radius}&query=${keyword}&limit=${limit}&min_price=${min_price}&max_price=${max_price}&offset=${offset}`;
@@ -30,10 +31,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       const tasks = data.results.map(async (result: Lunch) => {
         // get the logo path
-        result.logo = await getLogoPathLocal(result.name) || '';
+        try {
+          result.logo = await getLogoPathLocal(result.name) || '';
+        } catch (error) {
+          result.logo = '';
+        }
 
         // get the menu link
-        result.menu_link = await getMenuPathLocal(result.name) || '';
+        try {
+          result.menu_link = await getMenuPathLocal(result.name) || '';
+        } catch (error) {
+          result.menu_link = '';
+        }
 
         return result;
       });

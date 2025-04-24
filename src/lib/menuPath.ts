@@ -30,7 +30,6 @@ function getCachePath(query: string) {
 export async function getMenuPathLocal(name: string): Promise<string | null> {
   const cacheFile = getCachePath(name);
 
-  // ✅ 1. Check if cache exists
   if (fs.existsSync(cacheFile)) {
     const data = JSON.parse(fs.readFileSync(cacheFile, 'utf-8'));
     if (data && data.link) {
@@ -38,10 +37,8 @@ export async function getMenuPathLocal(name: string): Promise<string | null> {
     }
   }
 
-  // 🚀 2. If not cached, run search
   const link = await getMenuPath(name);
 
-  // 💾 3. Save to cache
   if (link) {
     fs.writeFileSync(cacheFile, JSON.stringify({ link }, null, 2));
   }

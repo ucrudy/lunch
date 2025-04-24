@@ -11,9 +11,10 @@ import LoadingOverlay from '@/components/LoadingOverlay';
 import InfoTag from '@/components/InfoTag';
 import InfoModal from '@/components/InfoModal';
 import { fetchLunch } from '@/lib/fetchLunch';
+import { Lunch } from '@/types/lunch';
 
 const App: React.FC = () => {
-  const { lunch, setLunch, loading, setLoading, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, priceRange, setIsModalOpen, isModalOpen } = useAppContext();
+  const { lunch, setLunch, loading, setLocation, setLoading, isFilterDrawerOpen, setIsFilterDrawerOpen, distance, priceRange, setIsModalOpen, isModalOpen } = useAppContext();
   const { location } = useAppContext();
   
   // get initial data of lunch places
@@ -22,9 +23,12 @@ const App: React.FC = () => {
     setLoading(true);
     
     async function fetchData() {
+
       const lunch = await fetchLunch(location, distance, priceRange, 1);
 
-      setLunch(lunch);
+      const filteredLunch = lunch.filter((l: Lunch) => l.logo);
+
+      setLunch(filteredLunch);
       setLoading(false);
     }
     fetchData();
@@ -60,7 +64,21 @@ const App: React.FC = () => {
           <div className='flex items-center'><Mouse />Scroll for more</div>
         </Chip>
       </div>
-      <InfoTag onClick={() => setIsModalOpen(!isModalOpen)} />
+      <div className='fixed bottom-2 left-2'>
+      <button
+        onClick={() => setIsModalOpen(!isModalOpen)}
+        className="underline text-2xl font-bold bg-transparent border-none p-0 m-0 cursor-pointer hover:text-gray-900"
+      >
+        info
+      </button>
+      <button
+        onClick={() => setLocation({ latitude: 39.867311, longitude: -84.137995 })}
+        className="underline text-2xl  pl-4 font-bold bg-transparent border-none p-0 m-0 cursor-pointer hover:text-gray-900"
+      >
+        demo location
+      </button>
+      </div>
+
       <InfoModal />
     </div>
   );

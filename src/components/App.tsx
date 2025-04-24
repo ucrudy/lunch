@@ -55,7 +55,7 @@ const App: React.FC = () => {
         <Funnel />
       </Button>
       <BubbleChart lunch={lunch} />
-      <div className="fixed bottom-2 left-1/2 -translate-x-1/2">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2">
         <Chip classNames={{
             base: "bg-gradient-to-br from-indigo-500 to-pink-500 border-small border-white/50 shadow-pink-500/30",
             content: "drop-shadow shadow-black text-white",

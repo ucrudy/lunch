@@ -4,7 +4,7 @@ import { Funnel, Mouse } from 'lucide-react';
 import {Button} from '@heroui/button'; 
 import { Chip, Drawer, DrawerBody, DrawerContent, DrawerHeader } from '@heroui/react';
 import { useAppContext } from '@/components/AppContext';
-import BubbleChart from '@/components/Bubbles/BubbleChart';
+import BubbleChart from '@/components/BubbleChart';
 import PriceSlider from '@/components/PriceSlider';
 import DistanceSlider from '@/components/DistanceSlider';
 import LoadingOverlay from '@/components/LoadingOverlay';

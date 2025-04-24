@@ -59,7 +59,7 @@ function scoreResult(result: SearchResult): number {
   let score = 0;
   const url = result.link.toLowerCase();
   const title = result.title.toLowerCase();
-  const snippet = result.snippet.toLowerCase();
+  const snippet = result?.snippet?.toLowerCase() || '';
   const domain = normalizeUrl(result.link);
 
   if (BAD_DOMAINS.includes(domain)) return -Infinity; // Disqualify

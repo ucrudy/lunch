@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useCallback } from 'react';
 import * as d3 from 'd3';
 import { Lunch } from '@/types/lunch';
 import { useAppContext } from '@/components/AppContext';
-import ScrollAttempt from '../ScrollAttempt';
+import ScrollAttempt from '@/components/ScrollAttempt';
 import { fetchLunch } from '@/lib/fetchLunch';
 
 type Props = {

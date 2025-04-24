@@ -8,7 +8,6 @@ import BubbleChart from '@/components/Bubbles/BubbleChart';
 import PriceSlider from '@/components/PriceSlider';
 import DistanceSlider from '@/components/DistanceSlider';
 import LoadingOverlay from '@/components/LoadingOverlay';
-import InfoTag from '@/components/InfoTag';
 import InfoModal from '@/components/InfoModal';
 import { fetchLunch } from '@/lib/fetchLunch';
 import { Lunch } from '@/types/lunch';

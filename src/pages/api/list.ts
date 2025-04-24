@@ -33,15 +33,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // get the logo path
         try {
           result.logo = await getLogoPathLocal(result.name) || '';
-        } catch (error) {
+        } catch (e) {
           result.logo = '';
+          console.log(e);
         }
 
         // get the menu link
         try {
           result.menu_link = await getMenuPathLocal(result.name) || '';
-        } catch (error) {
+        } catch (e) {
           result.menu_link = '';
+          console.log(e);
         }
 
         return result;

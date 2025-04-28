@@ -18,7 +18,7 @@ const App: React.FC = () => {
   
   // get initial data of lunch places
   useEffect(() => {
-    if (!location) return;
+    if (!location?.latitude && !location?.longitude) return;
     setLoading(true);
     
     async function fetchData() {

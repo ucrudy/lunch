@@ -71,7 +71,7 @@ const App: React.FC = () => {
         info
       </button>
       <button
-        onClick={() => setLocation({ latitude: 39.867311, longitude: -84.137995 })}
+        onClick={() => setLocation({ latitude: 40.754402, longitude: -73.978875 })}
         className="underline text-2xl  pl-4 font-bold bg-transparent border-none p-0 m-0 cursor-pointer hover:text-gray-900"
       >
         demo location

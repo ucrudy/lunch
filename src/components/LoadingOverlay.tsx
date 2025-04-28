@@ -7,8 +7,9 @@ type Props = {
 };
 
 const LoadingOverlay: React.FC<Props> = ({ isLoading }) => {
-  if (!isLoading) return null;
   const { location } = useAppContext();
+
+  if (!isLoading) return null;
   const label = !location ? 'Please enable location' : undefined;
 
   return (

@@ -48,7 +48,7 @@ interface AppProviderProps {
 // ModalProvider component that will hold the modal state
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [lunch, setLunch] = useState<Lunch[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
   const [location, setLocation] = useState<Location | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState<boolean>(false);

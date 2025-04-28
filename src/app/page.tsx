@@ -14,7 +14,6 @@ const Home: React.FC = () => {
   useEffect(() => {
     const getCurrentLocation = () => {
       if (navigator.geolocation && !location) {
-        setLoading(true);
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
@@ -25,7 +24,6 @@ const Home: React.FC = () => {
             if (err.code === err.PERMISSION_DENIED) {
               setShowLocationPrompt(true);
             }
-            setLoading(false);
           },
           {
             enableHighAccuracy: true, // Set to false to get less accurate data, reducing fluctuation
@@ -34,7 +32,7 @@ const Home: React.FC = () => {
       }
     };
     getCurrentLocation();
-  }, [location, setLoading, setLocation]);
+  }, [location, setLocation]);
 
   if(showLocationPrompt && !location) {
     return (
@@ -45,8 +43,7 @@ const Home: React.FC = () => {
             <MapPinCheck size={48} />
           </div>
           <h1 className="text-2xl font-bold mb-4">Please enable location access or use
-            <Button className="bg-transparent border-none text-2xl font-bold cursor-pointer underline text-blue-600 hover:text-blue-800" onPress={() => setLocation(
-             { latitude: 40.754402, longitude: -73.978875 })}>Demo Location</Button>
+            <Button className="bg-transparent border-none text-2xl font-bold cursor-pointer underline text-blue-600 hover:text-blue-800" onPress={() => setLocation({ latitude: 40.0548573, longitude: -84.1783053 })}>Demo Location</Button>
           </h1>
         </div>
       </div>

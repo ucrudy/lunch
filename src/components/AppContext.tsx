@@ -90,3 +90,5 @@ export const useAppContext = (): AppContextType => {
   }
   return context;
 };
+
+export default AppContext;

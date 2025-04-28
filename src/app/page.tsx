@@ -14,6 +14,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     const getCurrentLocation = () => {
       if (navigator.geolocation && !location) {
+        setLoading(true);
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
@@ -24,6 +25,7 @@ const Home: React.FC = () => {
             if (err.code === err.PERMISSION_DENIED) {
               setShowLocationPrompt(true);
             }
+            setLoading(false);
           },
           {
             enableHighAccuracy: true, // Set to false to get less accurate data, reducing fluctuation
@@ -32,7 +34,7 @@ const Home: React.FC = () => {
       }
     };
     getCurrentLocation();
-  }, [location, setLocation]);
+  }, [location, setLoading, setLocation]);
 
   if(showLocationPrompt && !location) {
     return (

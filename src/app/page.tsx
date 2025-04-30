@@ -45,7 +45,7 @@ const Home: React.FC = () => {
             <MapPinCheck size={48} />
           </div>
           <h1 className="text-2xl font-bold mb-4">Please enable location access or use
-            <Button className="bg-transparent border-none text-2xl font-bold cursor-pointer underline text-blue-600 hover:text-blue-800" onPress={() => setLocation({ latitude: 40.0548573, longitude: -84.1783053 })}>Demo Location</Button>
+            <Button className="bg-transparent border-none text-2xl font-bold cursor-pointer underline text-blue-600 hover:text-blue-800" onPress={() => setLocation({ latitude: 39.000273, longitude: -84.653335 })}>Demo Location</Button>
           </h1>
         </div>
       </div>

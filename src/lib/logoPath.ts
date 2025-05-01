@@ -27,9 +27,8 @@ export async function getLogoPathLocal(name: string): Promise<string | null> {
     const logoFile = logoMap[key];
   
     if (!logoFile) {
-    //   const logoFileApi = await getLogoPathApi(name);
-    //   return logoFileApi;
-        return '/logos/burgerking.png';
+      const logoFileApi = await getLogoPathApi(name);
+      return logoFileApi;
     }
 
     return logoFile; // Return the public URL path
@@ -54,6 +53,9 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
 
         return url;
     }
+
+    
+    return '/logos/burgerking.png';
     
     const res2 = await fetch(`https://api.brandfetch.io/v2/search/${name}?c=${BRAND_FETCH_API_KEY}`);
     

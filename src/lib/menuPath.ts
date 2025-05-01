@@ -39,9 +39,9 @@ export async function getMenuPathLocal(name: string): Promise<string | null> {
 
   const link = await getMenuPath(name);
 
-  if (link) {
-    fs.writeFileSync(cacheFile, JSON.stringify({ link }, null, 2));
-  }
+  // if (link) {
+  //   fs.writeFileSync(cacheFile, JSON.stringify({ link }, null, 2));
+  // }
 
   return link;
 }

@@ -49,7 +49,7 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
         const normalizeNamedName = normalizeName(name);
 
         // fire and forget download
-        downloadImage(normalizeNamedName, url);
+        // downloadImage(normalizeNamedName, url);
 
         return url;
     }

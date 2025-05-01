@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import sharp from 'sharp';
+// import sharp from 'sharp';
 
 const BRAND_FETCH_API_KEY = process.env.BRAND_FETCH_API_KEY;
 const LOGO_DEV_API_KEY = process.env.LOGO_DEV_API_KEY;

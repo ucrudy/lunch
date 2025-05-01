@@ -27,8 +27,9 @@ export async function getLogoPathLocal(name: string): Promise<string | null> {
     const logoFile = logoMap[key];
   
     if (!logoFile) {
-      const logoFileApi = await getLogoPathApi(name);
-      return logoFileApi;
+    //   const logoFileApi = await getLogoPathApi(name);
+    //   return logoFileApi;
+        return '/logos/burgerking.png';
     }
 
     return logoFile; // Return the public URL path

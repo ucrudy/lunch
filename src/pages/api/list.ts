@@ -1,5 +1,5 @@
-import {getLogoPathLocal } from '@/lib/logoPath';
-import { getMenuPathLocal } from '@/lib/menuPath';
+// import {getLogoPathLocal } from '@/lib/logoPath';
+// import { getMenuPathLocal } from '@/lib/menuPath';
 import { Lunch } from '@/types/lunch';
 import { NextApiRequest, NextApiResponse } from 'next';
 

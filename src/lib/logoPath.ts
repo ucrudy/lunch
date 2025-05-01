@@ -74,16 +74,16 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
 }
 
 // Async "fire-and-forget" download
-async function downloadImage(name:string, url: string) {
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Failed to fetch image');
+// async function downloadImage(name:string, url: string) {
+//     const response = await fetch(url);
+//     if (!response.ok) throw new Error('Failed to fetch image');
     
-    const buffer = await response.arrayBuffer();
-    const filename = `${name}.png`;
-    const filePath = path.join(process.cwd(), 'public', 'logos', filename);
+//     const buffer = await response.arrayBuffer();
+//     const filename = `${name}.png`;
+//     const filePath = path.join(process.cwd(), 'public', 'logos', filename);
 
-    // Use sharp to convert to PNG and save
-    await sharp(Buffer.from(buffer))
-      .png()
-      .toFile(filePath);
-  }
+//     // Use sharp to convert to PNG and save
+//     await sharp(Buffer.from(buffer))
+//       .png()
+//       .toFile(filePath);
+//   }

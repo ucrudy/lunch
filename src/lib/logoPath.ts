@@ -46,7 +46,7 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
 
     if (Array.isArray(dataLogo) && dataLogo.length > 0) {
         const url = dataLogo[0].logo_url;
-        const normalizeNamedName = normalizeName(name);
+        // const normalizeNamedName = normalizeName(name);
 
         // fire and forget download
         // downloadImage(normalizeNamedName, url);

@@ -1,5 +1,5 @@
-import {getLogoPathApi } from '@/lib/logoPath';
-import { getMenuPath } from '@/lib/menuPath';
+import {getLogoPathLocal } from '@/lib/logoPath';
+import { getMenuPathLocal } from '@/lib/menuPath';
 import { Lunch } from '@/types/lunch';
 import { NextApiRequest, NextApiResponse } from 'next';
 
@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const tasks = data.results.map(async (result: Lunch) => {
         // get the logo path
         try {
-          result.logo = await getLogoPathApi(result.name) || '';
+          result.logo = await getLogoPathLocal(result.name) || '';
         } catch (e) {
           result.logo = '';
           console.log(e);
@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         // get the menu link
         try {
-          result.menu_link = await getMenuPath(result.name) || '';
+          result.menu_link = await getMenuPathLocal(result.name) || '';
         } catch (e) {
           result.menu_link = '';
           console.log(e);

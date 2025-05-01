@@ -1,4 +1,4 @@
-// import {getLogoPathLocal } from '@/lib/logoPath';
+import {getLogoPathLocal } from '@/lib/logoPath';
 // import { getMenuPathLocal } from '@/lib/menuPath';
 import { Lunch } from '@/types/lunch';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -30,13 +30,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const data = await response.json();
 
       const tasks = data.results.map(async (result: Lunch) => {
-        // // get the logo path
-        // try {
-        //   result.logo = await getLogoPathLocal(result.name) || '';
-        // } catch (e) {
-        //   result.logo = '';
-        //   console.log(e);
-        // }
+        // get the logo path
+        try {
+          result.logo = await getLogoPathLocal(result.name) || '';
+        } catch (e) {
+          result.logo = '';
+          console.log(e);
+        }
 
         // // get the menu link
         // try {

@@ -53,9 +53,6 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
 
         return url;
     }
-
-    
-    return '/logos/burgerking.png';
     
     const res2 = await fetch(`https://api.brandfetch.io/v2/search/${name}?c=${BRAND_FETCH_API_KEY}`);
     
@@ -63,10 +60,10 @@ export async function getLogoPathApi(name: string): Promise<string | null> {
 
     if (Array.isArray(dataLogoBackup) && dataLogoBackup.length > 0) {
         const url = dataLogoBackup[0].icon;
-        const normalizeNamedName = normalizeName(name);
+        // const normalizeNamedName = normalizeName(name);
 
-        // fire and forget download
-        downloadImage(normalizeNamedName, url);
+        // // fire and forget download
+        // downloadImage(normalizeNamedName, url);
 
         return url;
     } else {
